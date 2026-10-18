@@ -1,11 +1,12 @@
 
 import javax.swing.JOptionPane;
 import java.sql.*;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import javax.swing.JOptionPane;
 
 public class JDInfantes extends javax.swing.JDialog {
-    
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(JDInfantes.class.getName());
     private Conexion cnx;
 
@@ -16,18 +17,31 @@ public class JDInfantes extends javax.swing.JDialog {
         setLocationRelativeTo(null);
         setTitle("Datos del Infante");
         jsFecha.setEditor(new javax.swing.JSpinner.DateEditor(jsFecha, "yyyy-MM-dd"));
-            /*try {
+        /*try {
             cnx =  DriverManager.getConnection("jdbc:mysql://localhost:3306/kindergarden", "root", "");
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "No se puede conectar: " +e.getMessage());
         }*/
     }
-    
-    public void ObtenerConexion(Conexion cnx){
+
+    public void ObtenerConexion(Conexion cnx) {
         this.cnx = cnx;
-        
+
     }
-    
+
+    public void obtenerInfante(Infante kid) {
+        jTCurp.setText(kid.curp);
+        jtNombreI.setText(kid.nombre);
+        jcSexo.setSelectedItem(kid.sexo);
+        jcEstado.setSelectedItem(kid.estado);
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            jsFecha.setValue(format.parse(kid.fecha));
+        } catch (ParseException ex) {
+            System.out.println("No pudo leer la fecha: [" + kid.fecha + "]");
+        }
+    }
+
     /*public Infante leerFormulario(){
         String curp = jTCurp.getText().trim();
         String nombre = jtNombreI.getText().trim();
@@ -36,15 +50,13 @@ public class JDInfantes extends javax.swing.JDialog {
         String estado = (String)jcEstado.getSelectedItem();
         return new Infante(curp, nombre, sexo, fecha, estado);
     }*/
-   
-    public void Limpiar(){
+    public void Limpiar() {
         jTCurp.setText("");
         jtNombreI.setText("");
         jcSexo.setSelectedIndex(0);
         jcEstado.setSelectedIndex(0);
         jsFecha.setValue(new java.util.Date());
     }
-    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -125,7 +137,7 @@ public class JDInfantes extends javax.swing.JDialog {
         btnActualizar.setText("Actualizar");
         btnActualizar.addActionListener(this::btnActualizarActionPerformed);
         getContentPane().add(btnActualizar);
-        btnActualizar.setBounds(130, 300, 82, 23);
+        btnActualizar.setBounds(120, 300, 82, 23);
 
         btnBorrar.setText("Borrar");
         btnBorrar.addActionListener(this::btnBorrarActionPerformed);
@@ -151,57 +163,51 @@ public class JDInfantes extends javax.swing.JDialog {
 
     private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarActionPerformed
         SimpleDateFormat s = new SimpleDateFormat("yyyy-MM-dd");
-                            //Si fuera dateTime fuera "yyyy-MM-dd HH:mm:ss"
+        //Si fuera dateTime fuera "yyyy-MM-dd HH:mm:ss"
         Infante kid = new Infante(
-                
-        jTCurp.getText(), jtNombreI.getText(), jcSexo.getSelectedItem().toString(), 
-        s.format((java.util.Date) jsFecha.getValue()), jcEstado.getSelectedItem().toString());
-        
+                jTCurp.getText(), jtNombreI.getText(), jcSexo.getSelectedItem().toString(),
+                s.format((java.util.Date) jsFecha.getValue()), jcEstado.getSelectedItem().toString());
+
         if (kid.insertar(cnx.getCon()) == 1) {
-        JOptionPane.showMessageDialog(this, "Infante Registrado");
-        this.dispose();
-    } else {
-        JOptionPane.showMessageDialog(this, "No se pudo registrar (¿CURP repetida o campos vacíos?)");
-    }
-        
-        /*Infante registro = leerFormulario();
-        if (registro.curp.trim().isEmpty() || registro.nombre.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "llena la CURP y nombre");
-            return;
+            JOptionPane.showMessageDialog(this, "Infante Registrado");
+            this.dispose();
+        } else {
+            JOptionPane.showMessageDialog(this, "No se pudo registrar (¿CURP repetida o campos vacíos?)");
         }
-        if(registro.insertar(cnx)> 0){
-            JOptionPane.showMessageDialog(this, "Infante registrado");
-            Limpiar();
-        }else{
-            JOptionPane.showMessageDialog(this, "No se pudo registrar quizas CURP repetida");
-        }*/
     }//GEN-LAST:event_btnRegistrarActionPerformed
 
     private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
-        /*Infante act = leerFormulario();
-        if(act.actualizar(cnx)> 0){
-            JOptionPane.showMessageDialog(this, "Infante registrado");
-        }else{
-            JOptionPane.showMessageDialog(this, "Error al registrar el Infante");
-        }*/
+        SimpleDateFormat s = new SimpleDateFormat("yyyy-MM-dd");
+        //Si fuera dateTime fuera "yyyy-MM-dd HH:mm:ss"
+        Infante kid = new Infante(
+                jTCurp.getText(), jtNombreI.getText(), jcSexo.getSelectedItem().toString(),
+                s.format((java.util.Date) jsFecha.getValue()), jcEstado.getSelectedItem().toString());
+
+        if (kid.actualizar(cnx.getCon()) == 1) {
+            JOptionPane.showMessageDialog(this, "Infante Actualizado");
+            this.dispose();
+        } else {
+            JOptionPane.showMessageDialog(this, "No se pudo registrar (¿CURP repetida o campos vacíos?)");
+        }
     }//GEN-LAST:event_btnActualizarActionPerformed
 
     private void btnBorrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBorrarActionPerformed
-        /*Infante bor = leerFormulario();
-        int op =JOptionPane.showConfirmDialog(this, "Borrar al infante con CURP " + bor.curp + "?", "Confirmar",
-                JOptionPane.YES_NO_OPTION);
-        if(op == JOptionPane.YES_OPTION){
-            if (bor.borrar(cnx) > 0) {
-                JOptionPane.showMessageDialog(this, "Infante borrado");
-                Limpiar();
-            } else {
-                JOptionPane.showMessageDialog(this, "Error al borrar");
-            }
-        }*/
+        SimpleDateFormat s = new SimpleDateFormat("yyyy-MM-dd");
+        //Si fuera dateTime fuera "yyyy-MM-dd HH:mm:ss"
+        Infante kid = new Infante(
+                jTCurp.getText(), jtNombreI.getText(), jcSexo.getSelectedItem().toString(),
+                s.format((java.util.Date) jsFecha.getValue()), jcEstado.getSelectedItem().toString());
+
+        if (kid.borrar(cnx.getCon()) == 1) {
+            JOptionPane.showMessageDialog(this, "Infante Borrado");
+            this.dispose();
+        } else {
+            JOptionPane.showMessageDialog(this, "No se pudo registrar (¿CURP repetida o campos vacíos?)");
+        }
     }//GEN-LAST:event_btnBorrarActionPerformed
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
-        /*dispose();*/
+        this.dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     /**
